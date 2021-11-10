@@ -63,7 +63,7 @@ def get_size(product_url):
 if __name__ == "__main__":
     ''' --------------------------------- INPUT YOUR CONFIG --------------------------------- '''
     MONITOR_DELAY = 5  # second, if your input 10, monitor interval 10 second
-    discord_webhook = 'https://discord.com/api/webhooks/802849403324989440/XsPGI-I48u9ZNonQ9GUcb0grL6tLHIVFsptic6R2O1993vVlcmTYVJQfY_aIWhr_fUTu'
+    discord_webhook = ''
 
     ''' ------------------------------------------------------------------------------------- '''
     my_header = {
