@@ -1,4 +1,3 @@
-#-*-encoding:utf8:-*-
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -15,19 +14,17 @@ def send_embed(site, product_name, price, img_link, product_link, size):
 
     # Set author info
     embed.set_author(name=site, icon='https://static-breeze.nike.co.kr/kr/ko_kr/cmsstatic/theme/52/android-icon-36x36.png')
-
-    #embed.set_desc("NEW: " + test)
     embed.add_field(name=" ", value='[{}]({})'.format(product_name, product_link))
     embed.add_field(name="가격", value=price)
     embed.add_field(name="사이즈", value=size)
     embed.set_thumbnail(img_link)
 
     # Set footer
-    embed.set_footer(text='@hyun woong', icon='https://static-breeze.nike.co.kr/kr/ko_kr/cmsstatic/theme/52/android-icon-36x36.png', ts=True)
+    embed.set_footer(text='@Nike Monitor', icon='https://static-breeze.nike.co.kr/kr/ko_kr/cmsstatic/theme/52/android-icon-36x36.png', ts=True)
 
     # Send Discord alert
     embed.post()
-
+# 사이즈
 def get_size(product_url):
     size_str = ''
 
@@ -38,14 +35,13 @@ def get_size(product_url):
         'referer': product_url
     }
     
-    # Product ID랑 TS 제작
     resp = requests.get(product_url, headers=my_header)
     bs = BeautifulSoup(resp.text, 'lxml')
     div = bs.find('div', class_='info-wrap_product_n uk-width-medium-1-1 uk-width-large-2-5')
     pid = div['data-product-id'].strip()
     ts = int(time.time() * 1000)
 
-    # 사이즈 따오기
+    # 사이즈 가져오기
     size_url = 'https://www.nike.com/kr/ko_kr/productSkuInventory?productId={}&_={}'.format(pid, ts)
     resp = requests.get (size_url, headers=my_header)
     resp.encoding = ''
@@ -56,22 +52,19 @@ def get_size(product_url):
         qunatity = data['quantity']
         if qunatity>0 :
             size_str += "{}({})\n".format(name, qunatity)
-
     return size_str
 
-
 if __name__ == "__main__":
-    ''' --------------------------------- INPUT YOUR CONFIG --------------------------------- '''
-    MONITOR_DELAY = 5  # second, if your input 10, monitor interval 10 second
-    discord_webhook = ''
+    ''' --------------------------------- Main --------------------------------- '''
+    MONITOR_DELAY = 5  # 5 = 5초
+    discord_webhook = 'https://discord.com/api/webhooks/802849403324989440/XsPGI-I48u9ZNonQ9GUcb0grL6tLHIVFsptic6R2O1993vVlcmTYVJQfY_aIWhr_fUTu'
 
     ''' ------------------------------------------------------------------------------------- '''
     my_header = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'
     }
-
-    # 모니터링 전에 상품 DB 만들기
-    print(">>> 초기 상품 리스트들을 불러오기")
+    # 기존 상품정보 가져오기
+    print("초기 페이지 로딩...")
     resp = requests.get('https://www.nike.com/kr/ko_kr/w/xg/xb/xc/new-releases', headers=my_header)
     resp.encoding = ''
     bs = BeautifulSoup(resp.text, 'lxml')
@@ -87,12 +80,11 @@ if __name__ == "__main__":
         product_db[title+secTitle] = [title, secTitle, imgLink, productLink, price] 
         #print(title+secTitle)
 
-    #일부러 하나뺴기
+    #테스트
+    product_db.pop('나이키 에어 허라치여성 신발 라이프스타일')
 
-    product_db.pop('나이키 덩크 하이여성 신발 라이프스타일')
-
-    # # 모니터링 시작 !
-    print(">>> 모니터링시작 !!")
+    #모니터링 시작
+    print("<모니터 시작>")
     for loopCnt in tqdm(range(int(1*60*60*24 / MONITOR_DELAY))):
         resp = requests.get('https://www.nike.com/kr/ko_kr/w/xg/xb/xc/new-releases', headers=my_header)
         resp.encoding = ''
@@ -107,5 +99,5 @@ if __name__ == "__main__":
             if title+secTitle not in product_db.keys():
                 size_str = get_size(productLink)
                 product_db[title + secTitle] = [title, secTitle, imgLink, productLink, price]
-                send_embed("Nike", title, price, imgLink, productLink, size_str)
+                send_embed("NIKE", title, price, imgLink, productLink, size_str)
         time.sleep(MONITOR_DELAY)
