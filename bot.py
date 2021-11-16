@@ -81,7 +81,7 @@ if __name__ == "__main__":
         #print(title+secTitle)
 
     #테스트
-    product_db.pop('나이키 에어 허라치여성 신발 라이프스타일')
+    product_db.pop('우먼스 와플 레이서 CRATER여성 신발 라이프스타일')
 
     #모니터링 시작
     print("<모니터 시작>")
@@ -99,5 +99,5 @@ if __name__ == "__main__":
             if title+secTitle not in product_db.keys():
                 size_str = get_size(productLink)
                 product_db[title + secTitle] = [title, secTitle, imgLink, productLink, price]
-                send_embed("NIKE", title, price, imgLink, productLink, size_str)
+                send_embed("Nike", title, price, imgLink, productLink, size_str)
         time.sleep(MONITOR_DELAY)
